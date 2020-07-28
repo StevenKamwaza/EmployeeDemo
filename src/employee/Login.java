@@ -80,13 +80,13 @@ public class Login extends JFrame {
 	  			               "chesteve", "che");
 	  				Statement stm = conn.createStatement();
 	  			){
-	  			  	String strSelect = "select username, password from employee";
+	  			  	String strSelect = "select username, password from captains";
 	  		      
 	  		         ResultSet rset = stm.executeQuery(strSelect);
 	  		         
 	  		         
-	  		         int rowCount = 0;
-	  		         while(rset.next()) {   // Move the cursor to the next row, return false if no more row
+	  		         boolean loginValue = true;
+	  		         for(int i=0;rset.next(); i++) {   // Move the cursor to the next row, return false if no more row
 	  		            String emai = rset.getString("username");
 	  		            String pass = rset.getString("password");
 	  		            
@@ -97,16 +97,19 @@ public class Login extends JFrame {
 	  		            	String accountpass=pass;
 	  		            	
 	  		            	//reseting the login feilds
+	  		            	loginValue=false;
 	  		            	email.setText("");
 	  		            	password.setText("");
 	  		            	
-	  		            	Employee newEmplo = new Employee();
-	  		            	Employee.main(null);
+	  		            	 new Employee();
 	  		            	
 	  		            	break;
 	  		            }
-	  		            ++rowCount;
-	  		         }
+	  		           
+	  		        }
+	  		        if(loginValue) {
+	  		        	JOptionPane.showMessageDialog(cp, "Incorrect Login Details");
+	  		        }
 	  		         //System.out.println("Total number of records = " + rowCount);
 	  		 conn.close();
 	  		}

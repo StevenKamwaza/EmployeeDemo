@@ -93,10 +93,21 @@ public class Employee extends JFrame {
 		  		         while(selectResults.next()) {
 		  		        	 
 		  		        	
-		  		        	displayPanel.add(new JTextField(selectResults.getString("firstname"),10));
-		  		        	displayPanel.add(new JTextField(selectResults.getString("lastname"),10));
-		  		        	displayPanel.add(new JTextField(selectResults.getString("empID"),10));
-		  		        	displayPanel.add(new JTextField(selectResults.getString("depID"),10));
+		  		        	JTextField fname= new JTextField(selectResults.getString("firstname"),10);
+		  		        	fname.setEditable(false);
+		  		        	displayPanel.add(fname); 
+		  		        	
+		  		        	JTextField lname= new JTextField(selectResults.getString("lastname"),10);
+		  		        	lname.setEditable(false);
+		  		        	displayPanel.add(lname);
+		  		        	
+		  		        	JTextField emp= new JTextField(selectResults.getString("empID"),10);
+		  		        	emp.setEditable(false);
+		  		        	displayPanel.add(emp);
+		  		        	
+		  		        	JTextField dept= new JTextField(selectResults.getString("depID"),10);
+		  		        	dept.setEditable(false);
+		  		        	displayPanel.add(dept);
 		  		        	
 		  		        	JButton id = new JButton("Assign");
 		  		        	id.setBackground(Color.GREEN);
@@ -105,16 +116,127 @@ public class Employee extends JFrame {
 
 								@Override
 								public void actionPerformed(ActionEvent e) {
-									// TODO Auto-generated method stub
-									JOptionPane.showMessageDialog(null, idNumber);
+									// assingning message to an employeee
+									//
+									displayPanel.setVisible(false);
+									
+									
+									//JOptionPane.showMessageDialog(cp, idNumber);
+									
+									//defining a gift of flag
+									ImageIcon logingif = new ImageIcon("mw.gif");
+							        
+									JLabel lbl = new JLabel("", logingif, JLabel.CENTER);
+									lbl.setBackground(Color.DARK_GRAY);
+									lbl.setOpaque(true);
+									
+			
+									
+									JPanel messagePanelTo = new JPanel();
+									messagePanelTo.setLayout(new FlowLayout());
+									setTitle("Send Message");
+									
+									JLabel from = new JLabel("From : ");
+									messagePanelTo.add(from);
+									
+									JLabel fromline = new JLabel("\n");
+									messagePanelTo.add(fromline);
+									
+									JTextField fromName = new JTextField(30);
+									messagePanelTo.add(fromName);
+									
+									//select lname of the employee
+									
+									String sql = "select firstname,lastname,depID from employee where id="+idNumber;
+									
+						  		    
+					  		        try {
+					  		        	Connection connnet =  DriverManager.getConnection(
+						  			               "jdbc:mysql://localhost:3306/employeedb?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",
+						  			               "chesteve", "che");
+						  				Statement statm = connnet.createStatement();
+										ResultSet employyee = statm.executeQuery(sql);
+										while(employyee.next()) {
+											String fromNamefirst= employyee.getString("firstname");
+											String fromNamelast= employyee.getString("lastname");
+											JLabel to = new JLabel("To :       ");
+											messagePanelTo.add(to);
+											
+											JTextField toName = new JTextField(30);
+											String nameTo = "Prof/Dr/Mr/Miss "+fromNamefirst+" "+fromNamelast+ " ";
+											toName.setText(nameTo);
+											toName.setEditable(false);
+											messagePanelTo.add(toName);
+											
+											JTextArea messagText = new JTextArea("Message",5, 35);
+											messagText.setAutoscrolls(true);
+											//messagText.getScrollableTracksViewportWidth();
+											messagText.setEditable(true);
+											messagePanelTo.add(messagText);
+											
+											JButton sendMessage = new JButton("Send");
+											sendMessage.setBackground(Color.green);
+											//send message to employee id = idanumber
+											sendMessage.addActionListener(new ActionListener() {
+
+												@Override
+												public void actionPerformed(ActionEvent e) {
+													String sqlin = "INSERT INTO message(mtext,fromNa,id) VALUES (?,?,?)";
+													PreparedStatement statement;
+													try {
+														statement = connnet.prepareStatement(sqlin);
+														statement.setString(1,messagText.getText());
+														statement.setString(2,fromName.getText() );
+														statement.setInt(3,idNumber);
+														
+														int countN = statement.executeUpdate();
+												         
+												         if(countN>0) {
+												        	JOptionPane.showMessageDialog(cp, "Message Sent!!");
+												        	messagePanelTo.setVisible(false);
+												        	
+												        	displayPanel.setVisible(true);
+												        	
+												         }
+												         connnet.close();
+													} catch (SQLException e1) {
+														// TODO Auto-generated catch block
+														e1.printStackTrace();
+													}
+													
+
+													
+												}
+												
+											});
+											messagePanelTo.add(sendMessage);
+											
+										}
+									} catch (SQLException e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
+					  		        
+									//messagePanelTo.setVisible(true);
+					  		        JPanel gift = new JPanel();
+									gift.add(lbl);
+									gift.setBounds(10, 10, 110,90);
+									gift.setBackground(Color.WHITE);
+									cp.add(gift);
+									
+									
+									messagePanelTo.setBounds(200, 5, 380, 700);
+									messagePanelTo.setBackground(Color.gray);
+									messagePanelTo.setAutoscrolls(true);
+									cp.setBackground(Color.white);
+									displayPanel.add(messagePanelTo);
+									cp.add(messagePanelTo);
 								}
 		  		        		
 		  		        	});
 		  		        	displayPanel.add(id);
 		  		        	displayPanel.add(new JLabel("     \n   "));
 		  		        	
-		  		        
-		 
 		  		         }
 		  		    
 		  		   conn.close();     
@@ -365,7 +487,7 @@ public class Employee extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		JOptionPane.showMessageDialog(null, "Welcome to admin Section");
+		//JOptionPane.showMessageDialog(null, "Welcome to admin Section");
 		new Employee();
 	}
 

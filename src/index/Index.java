@@ -26,13 +26,11 @@ public class Index extends JFrame{
 	private String emailvar;
 	private String passwordvar;
 	
+	private int numid;
 	public Index() {
 		Container cp = getContentPane();
 		cp.setLayout(null);
-		
-		
-		
-		
+				
 		JPanel mainPanel = new JPanel();
 		
 		emaillabel = new JLabel("Email :");
@@ -76,7 +74,7 @@ public class Index extends JFrame{
 	  			               "chesteve", "che");
 	  				Statement stm = conn.createStatement();
 	  			){
-	  			  	String strSelect = "select username, password from employee";
+	  			  	String strSelect = "select id ,username, password from employee";
 	  		      
 	  		         ResultSet rset = stm.executeQuery(strSelect);	  		         
 	  		         //logvalue used to detect if the credentials are valid if are not valid it will main its true state
@@ -84,19 +82,27 @@ public class Index extends JFrame{
 					for(int i= 0; rset.next();i++) {	  		        	
 	  		        	 String emai = rset.getString("username");
 		  		         String pass = rset.getString("password");
-		  		            
+		  		         String id = rset.getString("id");
+		  		         
+		  		         numid =Integer.parseInt(id);
+		  		         
 		  		         if(useremail.contains(emai) && userPassword.contains(pass)) {
 		  		        	 JOptionPane.showMessageDialog(cp, "Successfully login");
 		  		            	
 		  		            String accountusername =emai;
 		  		            String accountpass=pass;
 		  		            
+		  		            setIdNumber(numid);
+		  		            
 		  		            logvalue=false;
-		  		            	//reseting the login feilds
+//		  		           /reseting the login feilds
 		  		            email.setText("");
 		  		            password.setText("");
-		  		            	
-		  		            new Employee();
+		  		            
+		  		          //JOptionPane.showMessageDialog(cp, ""+getIdNumber());
+		  		            cp.setVisible(false);
+		  		            setVisible(false);
+		  		            new EmployeeIN(getIdNumber());
 		  		            //Employee.main(null);
 		  		            	
 		  		            break;
@@ -116,12 +122,10 @@ public class Index extends JFrame{
 	  		}
 	  		catch(SQLException e1) {
 	  			e1.printStackTrace();
-	  		}
-	    	  
+	  		}	    	  
 				
 			}
-	      });
-		
+	      });		
 		
 		reset= new JButton("Reset");
 		mainPanel.add(reset);
@@ -145,8 +149,7 @@ public class Index extends JFrame{
 				Login admin = new Login();
 				cp.setVisible(false);
 				setVisible(false);
-				admin.main(null);
-				
+				admin.main(null);				
 			}
 			
 		});
@@ -184,6 +187,14 @@ public class Index extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 		
 	}
+	
+	 public void setIdNumber(int numid) {
+	      this.numid = numid;
+	 }
+	 public  int getIdNumber() {
+	      return numid;
+	 }
+	 
 	public static void main(String [] che) {
 		new Index();
 	}

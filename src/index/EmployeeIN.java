@@ -5,6 +5,13 @@ package index;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import javax.swing.*;
 import javax.sql.*;
 /**
@@ -13,8 +20,9 @@ import javax.sql.*;
  */
 public class EmployeeIN extends JFrame  {
 
-	
-	public EmployeeIN() {
+	private static int id;
+	public EmployeeIN(int id) {
+		this.id=id;
 		Container cp = getContentPane();
 		cp.setLayout(null);
 		
@@ -68,20 +76,49 @@ public class EmployeeIN extends JFrame  {
 				gift2.setVisible(false);
 				
 				JPanel displayMessages = new JPanel();
+				
 				JLabel messagefrom = new JLabel("Admin"+"1");
 				displayMessages.add(messagefrom);
 				JLabel lines = new JLabel("  \n \n");
 				displayMessages.add(lines);
-				JTextArea sms = new JTextArea(5, 40);
-				sms.setText("hello, Mr Kamwaza, today you must develop airwing \n aeroplane tracker and don'nt forget to report to me!!");
-				sms.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-				sms.setAlignmentX(CENTER_ALIGNMENT);
-				sms.setAlignmentY(CENTER_ALIGNMENT);
-				sms.setWrapStyleWord(true);
-				sms.setAutoscrolls(true);
-				sms.setEditable(false);
-				displayMessages.add(sms);
 				
+				
+				try(
+		  				Connection conn =  DriverManager.getConnection(
+		  			               "jdbc:mysql://localhost:3306/employeedb?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",
+		  			               "chesteve", "che");
+		  				Statement stm = conn.createStatement();
+		  			){
+						
+											
+						
+		  			  	String strSelect = "SELECT * FROM employee JOIN message ON employee.id =message.id AND employee.id="+id;
+		  		      
+		  		         ResultSet selectResults = stm.executeQuery(strSelect);
+		  		         while(selectResults.next()) {
+		  		        	 
+		  		        	String messageText =selectResults.getString("mtext");
+		  		        	
+		  		        	JTextArea sms = new JTextArea(5, 30);
+		  					sms.setText(messageText+"\n \n Yours \n "+selectResults.getString("fromNa"));
+		  					sms.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		  					sms.setAlignmentX(CENTER_ALIGNMENT);
+		  					sms.setAlignmentY(CENTER_ALIGNMENT);
+		  					sms.setWrapStyleWord(true);
+		  					sms.setAutoscrolls(true);
+		  					sms.setEditable(false);
+		  					displayMessages.add(sms);
+		  					
+		  					
+		  					
+						}
+					} 
+				catch (SQLException e1) {
+					//TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+       	 
+			
 				JButton copysms = new JButton("Report");
 				displayMessages.add(copysms);
 				
@@ -102,21 +139,7 @@ public class EmployeeIN extends JFrame  {
 		
 		JButton logout = new JButton("Logout");
 		logout.setBackground(Color.red);
-		homePanel.add(logout);
-	
-
-//		ImageIcon images = new ImageIcon("contact.gif");  // relative to project root (or bin)
-//        JLabel lbl1 = new JLabel("", images, JLabel.CENTER);
-//		lbl1.setBackground(Color.DARK_GRAY);
-//		lbl1.setOpaque(true);
-//		
-//		JPanel gift1 = new JPanel();
-//		gift1.add(lbl1);
-//		gift1.setBounds(370, 60, 310,266);
-//		cp.add(gift1);
-
-		
-		
+		homePanel.add(logout);	
 		homePanel.setBackground(Color.DARK_GRAY);
 		homePanel.setBounds(100,10, 600, 40);
 		cp.add(homePanel);
@@ -128,8 +151,10 @@ public class EmployeeIN extends JFrame  {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 	}
-	public static void main(String []argd) {
-		new EmployeeIN();
+	public static void main(String [] chesteve) {
+		new EmployeeIN(id);
 	}
+	
+	 
 
 }
